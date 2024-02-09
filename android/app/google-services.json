@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "290395990152",
+    "project_id": "sudanese-community-in-kfupm",
+    "storage_bucket": "sudanese-community-in-kfupm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290395990152:android:cc63ab28bcf87a5019573d",
+        "android_client_info": {
+          "package_name": "com.example.sudanese_community"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz1xfJQS4DToEZ033btmSXwSWnBKyFfD8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
