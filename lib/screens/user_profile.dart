@@ -35,7 +35,9 @@ class _UserProfileState extends State<UserProfile> {
     await FirebaseFirestore.instance
         .collection('UserData')
         .doc(widget.id)
-        .update({'photo': image});
+        .update({'photo': theImage.path});
+
+    userData();
   }
 
   @override
@@ -44,6 +46,9 @@ class _UserProfileState extends State<UserProfile> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onBackground,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white, // Change the color of the navigation icon
+        ),
         title: const Text(
           'User Profile',
           style: TextStyle(color: Colors.white),
@@ -51,79 +56,99 @@ class _UserProfileState extends State<UserProfile> {
         centerTitle: true,
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                      width: 4, color: Theme.of(context).primaryColor)),
-              margin: const EdgeInsets.all(8),
-              width: double.infinity,
-              height: 250,
-              child: x['photo'] == null
-                  ? Center(
-                      child: Icon(
-                        Icons.person,
-                        size: 150,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    )
-                  : Image.file(
-                      File(x['photo']!),
-                      fit: BoxFit.cover,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).primaryColor,
+              Color(0xFF78C28F),
+              Color(0xFF92DDA5),
+              Color(0xFFAADFB6),
+            ],
+            stops: [0.1, 0.3, 0.8, 0.9],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: x == null // Check if user data is null
+              ? Center(
+                  child:
+                      CircularProgressIndicator()) // Show CircularProgressIndicator if data is null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                              width: 4, color: Theme.of(context).primaryColor)),
+                      margin: const EdgeInsets.all(8),
+                      width: double.infinity,
+                      height: 250,
+                      child: x['photo'] == null
+                          ? Center(
+                              child: Icon(
+                                Icons.person,
+                                size: 150,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            )
+                          : Image.file(
+                              File(x['photo']!),
+                              fit: BoxFit.cover,
+                            ),
                     ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton.icon(
-                    onPressed: () {
-                      cam = false;
-                      _takeImage(cam);
-                    },
-                    icon: const Icon(Icons.camera),
-                    label: const Text('Gallery')),
-                TextButton.icon(
-                    onPressed: () {
-                      cam = true;
-                      _takeImage(cam);
-                    },
-                    icon: const Icon(Icons.camera),
-                    label: const Text('Camera'))
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'Name: ', name: x['name']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'Dept: ', name: x['department']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'Phone: ', name: x['phone']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'WhatsApp: ', name: x['whatsapp']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'Room: ', name: x['room']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'Job Title: ', name: x['job title']),
-            x == null
-                ? const CircularProgressIndicator()
-                : DatText(indecator: 'id: ', name: x['id']),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                            onPressed: () {
+                              cam = false;
+                              _takeImage(cam);
+                            },
+                            icon: const Icon(Icons.camera),
+                            label: const Text('Gallery')),
+                        TextButton.icon(
+                            onPressed: () {
+                              cam = true;
+                              _takeImage(cam);
+                            },
+                            icon: const Icon(Icons.camera),
+                            label: const Text('Camera'))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'Name: ', name: x['name']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'Dept: ', name: x['department']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'Phone: ', name: x['phone']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'WhatsApp: ', name: x['whatsapp']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'Room: ', name: x['room']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(
+                            indecator: 'Job Title: ', name: x['job title']),
+                    x == null
+                        ? const CircularProgressIndicator()
+                        : DatText(indecator: 'id: ', name: x['id']),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
         ),
       ),
     );

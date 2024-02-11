@@ -2,8 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sudanese_community/firebase_options.dart';
 import 'package:sudanese_community/screens/Users.dart';
+import 'package:sudanese_community/screens/auth.dart';
+import 'package:sudanese_community/screens/signin.dart';
 import 'package:sudanese_community/screens/signup.dart';
+import 'package:sudanese_community/screens/splashscreen.dart';
 import 'package:sudanese_community/screens/user_profile.dart';
+import 'package:sudanese_community/test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const Users(),
+      home: SplashScreen(),
     );
   }
 }
