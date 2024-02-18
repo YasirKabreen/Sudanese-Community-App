@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sudanese_community/screens/Users.dart';
+import 'package:sudanese_community/screens/deliveryScreens.dart';
 import 'package:sudanese_community/screens/officers.dart';
 import 'package:sudanese_community/screens/signin.dart';
 
@@ -83,6 +84,25 @@ class HomeScreen extends StatelessWidget {
                 },
                 child: Text(
                   'Community Officers Profiles',
+                  style: TextStyle(fontSize: 18.0),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).primaryColor,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => RestaurantScreen()));
+                },
+                child: Text(
+                  ' Students Delivery',
                   style: TextStyle(fontSize: 18.0),
                 ),
                 style: ElevatedButton.styleFrom(

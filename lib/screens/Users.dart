@@ -18,8 +18,9 @@ class _UsersState extends State<Users> {
           color: Colors.white, // Change the color of the navigation icon
         ),
         title: const Text(
-          'KFUPM ',
-          style: TextStyle(color: Colors.white),
+          'The Community Members ',
+          style: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Theme.of(context).primaryColor,
@@ -39,7 +40,10 @@ class _UsersState extends State<Users> {
           ),
         ),
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('UserData').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('UserData')
+              .orderBy('department')
+              .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -55,13 +59,25 @@ class _UsersState extends State<Users> {
                       snapshot.data!.docs[index].data() as Map<String, dynamic>;
                   return ListTile(
                     leading: CircleAvatar(
-                      child: Center(
-                          child: Icon(
-                        Icons.person,
-                        color: Theme.of(context).primaryColor,
-                        size: 35,
-                      )),
+                      radius: 25, // Adjust the radius based on your requirement
                       backgroundColor: Colors.white,
+                      child: Center(
+                        child: ClipOval(
+                          child: userData['photo'] == null
+                              ? Icon(
+                                  Icons.person,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 35,
+                                )
+                              : Image.network(
+                                  userData['photo']!,
+                                  fit: BoxFit.cover,
+                                  width:
+                                      50, // Set the width and height to twice the radius
+                                  height: 50,
+                                ),
+                        ),
+                      ),
                     ),
                     title: Text(
                       userData['name'],

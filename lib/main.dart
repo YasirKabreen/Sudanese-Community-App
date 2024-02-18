@@ -6,6 +6,7 @@ import 'package:sudanese_community/screens/auth.dart';
 import 'package:sudanese_community/screens/signin.dart';
 import 'package:sudanese_community/screens/signup.dart';
 import 'package:sudanese_community/screens/splashscreen.dart';
+import 'package:sudanese_community/screens/test2.dart';
 import 'package:sudanese_community/screens/user_profile.dart';
 import 'package:sudanese_community/test.dart';
 

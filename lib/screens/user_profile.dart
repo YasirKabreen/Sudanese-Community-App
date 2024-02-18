@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,27 +25,41 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   File? image;
-  void _takeImage(bool cam) async {
+  void _takeImage(ImageSource source) async {
     var picker = ImagePicker();
-    var theImage = await picker.pickImage(
-        source: cam ? ImageSource.camera : ImageSource.gallery);
+    var theImage = await picker.pickImage(source: source);
     if (theImage == null) {
       return;
     }
     setState(() {
       image = File(theImage.path);
     });
-    await FirebaseFirestore.instance
-        .collection('UserData')
-        .doc(widget.id)
-        .update({'photo': theImage.path});
+    try {
+      if (image == null) return;
+
+      // Upload image to Firebase Storage
+      await Firebase.initializeApp();
+      var ref = FirebaseStorage.instance.ref().child('images/${widget.id}.png');
+      await ref.putFile(image!);
+
+      // Retrieve the download URL for the uploaded image
+      String imageUrl = await ref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('UserData')
+          .doc(widget.id)
+          .update({'photo': imageUrl});
+
+      // Do something with the imageUrl, like storing it in a database
+      print('Image uploaded. URL: $imageUrl');
+    } catch (e) {
+      print('Error uploading image to Firebase Storage: $e');
+    }
 
     userData();
   }
 
   @override
   Widget build(BuildContext context) {
-    bool cam = true;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onBackground,
       appBar: AppBar(
@@ -95,8 +112,8 @@ class _UserProfileState extends State<UserProfile> {
                                 color: Theme.of(context).primaryColor,
                               ),
                             )
-                          : Image.file(
-                              File(x['photo']!),
+                          : Image.network(
+                              x['photo']!,
                               fit: BoxFit.cover,
                             ),
                     ),
@@ -105,15 +122,13 @@ class _UserProfileState extends State<UserProfile> {
                       children: [
                         TextButton.icon(
                             onPressed: () {
-                              cam = false;
-                              _takeImage(cam);
+                              _takeImage(ImageSource.gallery);
                             },
                             icon: const Icon(Icons.camera),
                             label: const Text('Gallery')),
                         TextButton.icon(
                             onPressed: () {
-                              cam = true;
-                              _takeImage(cam);
+                              _takeImage(ImageSource.camera);
                             },
                             icon: const Icon(Icons.camera),
                             label: const Text('Camera'))
