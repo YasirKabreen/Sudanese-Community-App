@@ -1,91 +1,103 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
+import 'package:file_picker/file_picker.dart';
 
-class RestaurantScreen extends StatelessWidget {
+class PdfUploader extends StatefulWidget {
+  @override
+  _PdfUploaderState createState() => _PdfUploaderState();
+}
+
+class _PdfUploaderState extends State<PdfUploader> {
+  File? selectedPdf;
+  UploadTask? task;
+
+  Future pickPDF() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedPdf = File(result.files.single.path!);
+      });
+    }
+  }
+
+  Future uploadPDF() async {
+    if (selectedPdf == null) return;
+
+    String fileName = path.basename(selectedPdf!.path);
+    Reference reference =
+        FirebaseStorage.instance.ref().child('pdfs').child(fileName);
+    task = reference.putFile(selectedPdf!);
+
+    setState(() {});
+
+    task!.snapshotEvents.listen((TaskSnapshot snapshot) {
+      print('Task state: ${snapshot.state}');
+      print(
+          'Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100} %');
+    });
+
+    try {
+      await task!.whenComplete(() => print('Upload complete'));
+    } catch (e) {
+      print('Error uploading PDF: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Restaurants'),
-      ),
-      body: ListView(
-        children: [
-          RestaurantTile(
-            name: 'Al-Baik',
-            imagePath:
-                'lib/assets/Albaik.jpg', // Replace with actual image path
-            onTap: () {
-              // Handle onTap event for Al-Baik
-            },
+        title: Text(
+          'PDF Uploader',
+          style: TextStyle(
+            fontFamily: 'Bossiple',
           ),
-          RestaurantTile(
-            name: 'Al Kofa',
-            imagePath: 'lib/assets/kufa.jpg', // Replace with actual image path
-            onTap: () {
-              // Handle onTap event for Al Kofa
-            },
-          ),
-          RestaurantTile(
-            name: 'Agashi',
-            imagePath:
-                'lib/assets/hq720.webp', // Replace with actual image path
-            onTap: () {
-              // Handle onTap event for Agashi
-            },
-          ),
-          // Add more RestaurantTiles for additional restaurants
-        ],
-      ),
-    );
-  }
-}
-
-class RestaurantTile extends StatelessWidget {
-  final String name;
-  final String imagePath;
-  final VoidCallback onTap;
-
-  const RestaurantTile({
-    required this.name,
-    required this.imagePath,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(8),
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
         ),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                imagePath,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: pickPDF,
+              child: Text('Pick a PDF file'),
+            ),
+            SizedBox(height: 20),
+            if (selectedPdf != null)
+              Text('Selected PDF: ====> ${path.basename(selectedPdf!.path)}'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: uploadPDF,
+              child: Text('Upload PDF'),
+            ),
+            if (task != null) ...[
+              SizedBox(height: 20),
+              StreamBuilder<TaskSnapshot>(
+                stream: task!.snapshotEvents,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final bytesTransferred =
+                        snapshot.data!.bytesTransferred.toDouble();
+                    final totalBytes = snapshot.data!.totalBytes.toDouble();
+                    final progress = (bytesTransferred / totalBytes) * 100;
+                    return Text(
+                        'Upload Progress: ${progress.toStringAsFixed(2)} %');
+                  } else {
+                    return Container();
+                  }
+                },
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            ],
           ],
         ),
       ),
